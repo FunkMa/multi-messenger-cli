@@ -7,7 +7,7 @@ Python 3.10
 
 Modules: 
 - Selenium (to navigate through browser applications)
-- Pillow (To open images with the standard image viewer)
+- Pillow (To open images with the default image viewer)
 
 Install modules with:
 ```
@@ -16,12 +16,15 @@ py -3.10 -m pip install pillow==9.1.1 selenium==4.1.5
 
 ## Usage
 
-A few examples of useful commands and/or tasks.
-
+To use all supported messenger services in headless browser mode, start with:
 ```
-$ First example
-$ Second example
-$ And keep this in mind
+py -3.10 -m ./path_to_repo/app.py
+```
+
+
+To use a single messenger service (e.g. Telegram) without headless mode:
+```
+py -3.10 -m pip install ./path_to_repo/telegram_controller.py
 ```
 
 ### Disclaimer
