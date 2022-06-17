@@ -3,6 +3,8 @@ A multi-messenger cli application for whatsapp, telegram and messenger (from fac
 
 ### Prerequisites
 
+Firefox
+
 Python 3.10
 
 Modules: 
