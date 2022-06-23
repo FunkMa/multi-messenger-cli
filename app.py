@@ -12,7 +12,13 @@ import messenger_controller
 import utilities
 
 messenger_services = ["Whatsapp", "Telegram", "Messenger"]
-PATH = os.path.abspath("geckodriver.exe")
+if os.name == "posix":
+    geckodriver_exe = "geckodriver_linux"
+elif os.name in ("nt", "dos", "ce"):
+    geckodriver_exe = "geckodriver_win.exe"
+else:
+    print("ERROR: No supported driver for Firefox found")
+PATH = os.path.abspath(geckodriver_exe)
 
 def add_messenger_service(services={}):
     for index, service in enumerate(messenger_services, start=1):
@@ -50,7 +56,7 @@ def message_contact(services_dict):
         return
 
 if __name__ == "__main__":
-    
+
     # TODO: add other browser support
     #driver = webdriver.Firefox(executable_path=PATH)
 

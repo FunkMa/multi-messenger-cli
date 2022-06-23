@@ -1,5 +1,3 @@
-from asyncio.windows_events import NULL
-from turtle import window_height
 from selenium import webdriver
 import selenium
 from selenium.webdriver.common.by import By
@@ -51,7 +49,7 @@ class WhatsAppController:
             print("Timed out waiting for page to load")
 
         return login_status
-    
+
     def __get_contacts(self,):
         print("Loading contacts...")
         #TODO: remove the sleep
@@ -106,8 +104,8 @@ class WhatsAppController:
                 name_search_bar.send_keys(dupe)
                 time.sleep(3)
                 for x in range(1, duplicate_names.count(dupe) + 1):
-                    
-                    
+
+
                     #self.driver.find_element(by=By.CSS_SELECTOR, value="div[style*='z-index: %i;']" % i).click()
                     #name_search_bar.click()
                     for x in range(1, x+1):
@@ -154,13 +152,15 @@ class WhatsAppController:
 
                 input_field.send_keys(user_message)
                 input_field.send_keys(Keys.ENTER)
+
+                time.sleep(5)
                 chat_history = self.read_chat()
             except KeyboardInterrupt:
                 break
         return False
 
     def read_chat(self,):
-        time.sleep(1)
+        time.sleep(3)
         WebDriverWait(self.driver, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div[4]/div/div[3]/div/div[2]/div[3]')))
         message_list = []
         message_webelement_list = self.driver.find_elements(by=By.XPATH, value='/html/body/div[1]/div/div/div[4]/div/div[3]/div/div[2]/div[3]/div')
@@ -168,7 +168,7 @@ class WhatsAppController:
             try:
                 timestamp = message_webelement.find_element(by=By.XPATH, value='.//div/div[1]/div[1]/div[1]').get_attribute("data-pre-plain-text")
                 message_text = message_webelement.find_element(by=By.XPATH, value='.//div/div[1]/div[1]/div[1]/div/span[1]/span').text
-                
+
                 message = "[{TIMESTAMP}] {MESSAGE}".format(
                         TIMESTAMP = timestamp,
                         MESSAGE = message_text
@@ -178,15 +178,19 @@ class WhatsAppController:
             except Exception as e:
                 continue
         return message_list
-        
+
 # entry point for testing
 if __name__ == "__main__":
     # init
-    FIREFOX_PATH = os.path.abspath("geckodriver.exe")
+    if os.name == "posix":
+        geckodriver_exe = "geckodriver_linux"
+    elif os.name in ("nt", "dos", "ce"):
+        geckodriver_exe = "geckodriver_win.exe"
+    FIREFOX_PATH = os.path.abspath(geckodriver_exe)
     whatsapp_ctrl = WhatsAppController(FIREFOX_PATH, test=True)
     if not whatsapp_ctrl.login_state:
         whatsapp_ctrl.driver.quit()
-    
+
     print("Successfully logged in!")
     print("Contacts: ")
     # print contact dict

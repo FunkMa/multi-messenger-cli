@@ -1,9 +1,5 @@
-#from ssl import _PasswordType
-from cgitb import text
 from datetime import date
-from lib2to3.pgen2 import driver
 from unicodedata import name
-from pkg_resources import empty_provider
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -130,7 +126,6 @@ class MessengerController:
                 print(chat_history)
             except KeyboardInterrupt:
                 break
-        return target_found
 
     def __read_chat_history(self):
         message_list = []
@@ -162,7 +157,13 @@ class MessengerController:
 
 # Entry Point
 if __name__ == "__main__":
-    FIREFOX_PATH = os.path.abspath("geckodriver.exe")
+    if os.name == "posix":
+        geckodriver_exe = "geckodriver_linux"
+    elif os.name in ("nt", "dos", "ce"):
+        geckodriver_exe = "geckodriver_win.exe"
+    else:
+        print("ERROR: No supported driver for Firefox found")
+    FIREFOX_PATH = os.path.abspath(geckodriver_exe)
     messenger_ctrl = MessengerController(FIREFOX_PATH, test=True)
     print("Successfully logged in!")
     print("Contacts:")

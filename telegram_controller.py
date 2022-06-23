@@ -9,7 +9,7 @@ import utilities
 import os
 import time
 
-# Maximum wait time to load a website 
+# Maximum wait time to load a website
 MAX_TIMEOUT = 60
 # Maximum wait time to load a single website element (e.g. a button)
 TIMEOUT = 10
@@ -20,7 +20,6 @@ class TelegramController:
     """
     Class used to interact with the telegram web ui
     ...
-
     Attributes
     ----------
     phone_number : str
@@ -31,10 +30,9 @@ class TelegramController:
         true if the account is logged in, otherwise false
     contacts : dictionary
         contains the contacts user name and their id
-
     Methods
     -------
-    # TODO: document 
+    # TODO: document
     """
     def __init__(self, driver_path, debugging=False):
         options = webdriver.FirefoxOptions()
@@ -59,7 +57,7 @@ class TelegramController:
                 # TODO: offer retry or abort on error
                 print("Loading contacts...")
                 self.contacts = self.__get_contacts()
-                    
+
 
     def __login(self,):
         login_status = False
@@ -94,7 +92,6 @@ class TelegramController:
         duplicate_names = []
         # Add contacts from bottom of list (inactive contacts) to top (online)
         WebDriverWait(self.driver, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[1]/div[1]/div/div/div[2]/div[1]/div[2]/div[2]/div')))
-        time.sleep(1)
         WebDriverWait(self.driver, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[1]/div[1]/div/div/div[2]/div[1]/div[2]/div[2]/div'))).send_keys(Keys.PAGE_DOWN)
         new_contact_added = True
         while new_contact_added:
@@ -118,7 +115,7 @@ class TelegramController:
                 name_search_bar.send_keys(Keys.DELETE)
                 name_search_bar.send_keys(dupe)
                 WebDriverWait(self.driver, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[1]/div[1]/div/div/div[2]/div[2]/div[2]/div/div/div[1]/div/div[1]/ul/li[1]/div[1]')))
-                
+
                 # Get contact phone number / id
                 search_results = self.driver.find_elements(by=By.XPATH, value='/html/body/div[1]/div[1]/div[1]/div/div/div[2]/div[2]/div[2]/div/div/div[1]/div/div[1]/ul/li')
                 for contact in search_results:
@@ -157,24 +154,25 @@ class TelegramController:
                     utilities.clear_terminal()
                     for message in chat_history:
                         print(message)
-                    
+
                     input_field.send_keys(input("Send message (ctrl + c to quit):"))
                     input_field.send_keys(Keys.ENTER)
                     # wait until new message moved all div container
-                    time.sleep(5)
+                    time.sleep(2)
                     chat_history = self.__read_chat_history()
-                    print(chat_history)
                 except KeyboardInterrupt:
                     break
         return target_found
-    
+
     def __read_chat_history(self, max_messages=0):
         message_list = []
         for dategroup_messages in self.driver.find_elements(by=By.CLASS_NAME, value='bubbles-date-group'):
-            date = dategroup_messages.find_element(by=By.XPATH, value='.//div[2]/div/div/span').text
+            date = dategroup_messages.find_element(by=By.XPATH, value=".//div[1]/div/div/span").text
+            if not date:
+                date = dategroup_messages.find_element(by=By.XPATH, value=".//div[2]/div/div/span").text
+            time.sleep(1)
             for message_element in dategroup_messages.find_elements(by=By.CLASS_NAME, value='message'):
-                print(message_element.text)
-                if message_element.value_of_css_property("--message-background-color") == "#8774E1":
+                if message_element.value_of_css_property("--message-background-color") == "#eeffde":
                     name = "You"
                 else:
                     name = self.driver.find_element(by=By.XPATH, value='/html/body/div[1]/div[1]/div[2]/div/div/div[2]/div[1]/div[1]/div/div/div[1]/div/span').text
@@ -190,7 +188,13 @@ class TelegramController:
 
 # Entry point for testing
 if __name__ == "__main__":
-    FIREFOX_PATH = os.path.abspath("geckodriver.exe")
+    if os.name == "posix":
+        geckodriver_exe = "geckodriver_linux"
+    elif os.name in ("nt", "dos", "ce"):
+        geckodriver_exe = "geckodriver_win.exe"
+    else:
+        print("ERROR: No supported driver for Firefox found")
+    FIREFOX_PATH = os.path.abspath(geckodriver_exe)
     telegram_ctrl = TelegramController(FIREFOX_PATH, debugging=True)
     if not telegram_ctrl.login_state:
         telegram_ctrl.driver.quit()
@@ -211,7 +215,3 @@ if __name__ == "__main__":
                 print("ERROR: Could not open chat")
         except KeyboardInterrupt:
             break
-
-    
-    
-
